@@ -9,11 +9,10 @@ import java.util.List;
  * Created by Marti on 25/02/2016.
  */
 public class Group {
-
     @InjectLinks({})
     private List<Link> links;
     private List<User> users;
-    private ThemeCollection themes;
+    private ThemeCollection collectionThemes;
     private String id;
     private String name;
     private long creationTimestamp;
@@ -39,12 +38,12 @@ public class Group {
         return users;
     }
 
-    public ThemeCollection getThemes() {
-        return themes;
+    public ThemeCollection getCollectionThemes() {
+        return collectionThemes;
     }
 
-    public void setThemes(ThemeCollection themes) {
-        this.themes = themes;
+    public void setCollectionThemes(ThemeCollection collectionThemes) {
+        this.collectionThemes = collectionThemes;
     }
 
     public void setUsers(List<User> users) {

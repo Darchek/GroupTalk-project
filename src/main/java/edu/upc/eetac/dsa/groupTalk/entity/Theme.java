@@ -15,7 +15,7 @@ public class Theme {
     private String id;
     private String userid;
     private String title;
-    private String comment;
+    private String content;
     private long creationTimestamp;
     private long lastModified;
 
@@ -59,12 +59,12 @@ public class Theme {
         this.title = title;
     }
 
-    public String getComment() {
-        return comment;
+    public String getContent() {
+        return content;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public long getCreationTimestamp() {

@@ -14,7 +14,7 @@ public class ThemeCollection {
     private List<Link> links;
     private long newestTimestamp;
     private long oldestTimestamp;
-    private List<Theme> groups = new ArrayList<>();
+    private List<Theme> themes = new ArrayList<>();
 
     public List<Link> getLinks() {
         return links;
@@ -40,11 +40,11 @@ public class ThemeCollection {
         this.oldestTimestamp = oldestTimestamp;
     }
 
-    public List<Theme> getGroups() {
-        return groups;
+    public List<Theme> getThemes() {
+        return themes;
     }
 
-    public void setGroups(List<Theme> groups) {
-        this.groups = groups;
+    public void setThemes(List<Theme> themes) {
+        this.themes = themes;
     }
 }
