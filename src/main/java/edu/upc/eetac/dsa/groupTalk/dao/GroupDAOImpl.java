@@ -1,9 +1,6 @@
 package edu.upc.eetac.dsa.groupTalk.dao;
 
-import edu.upc.eetac.dsa.groupTalk.entity.Group;
-import edu.upc.eetac.dsa.groupTalk.entity.GroupCollection;
-import edu.upc.eetac.dsa.groupTalk.entity.Theme;
-import edu.upc.eetac.dsa.groupTalk.entity.User;
+import edu.upc.eetac.dsa.groupTalk.entity.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,10 +12,10 @@ import java.util.List;
 /**
  * Created by Marti on 04/03/2016.
  */
-public class GroupDAOImp implements GroupDAO {
+public class GroupDAOImpl implements GroupDAO {
 
     @Override
-    public Group createGroup(String name, String userid) throws SQLException {
+    public Group createGroup(String userid, String name) throws SQLException {
         Connection connection = null;
         PreparedStatement stmt = null;
         String id = null;
@@ -73,7 +70,7 @@ public class GroupDAOImp implements GroupDAO {
 
     @Override
     public Group getGroupById(String id) throws SQLException {
-        Group group = new Group();
+        Group group = null;
         Connection connection = null;
         PreparedStatement stmt = null;
         try {
@@ -83,27 +80,15 @@ public class GroupDAOImp implements GroupDAO {
             stmt.setString(1, id);
 
             ResultSet rs = stmt.executeQuery();
-            boolean first = true;
-            while (rs.next()) {
-                if(first) {
-                    group.setId(rs.getString("gid"));
-                    group.setName(rs.getString("gname"));
-                    group.setLastModified(rs.getTimestamp("glast").getTime());
-                    group.setCreationTimestamp(rs.getTimestamp("gcreation").getTime());
-                    group.getCollectionThemes().setNewestTimestamp((rs.getTimestamp("tlast").getTime()));
-                    first = false;
-                }
-                Theme theme = new Theme();
-                theme.setId(rs.getString("tid"));
-                theme.setUserid(rs.getString("tuserid"));
-                theme.setTitle(rs.getString("ttitle"));
-                theme.setContent(rs.getString("tcontent"));
-                theme.setLastModified(rs.getTimestamp("tlast").getTime());
-                theme.setCreationTimestamp(rs.getTimestamp("tcreation").getTime());
-                group.getCollectionThemes().setOldestTimestamp(rs.getTimestamp("tlast").getTime());
-                group.getCollectionThemes().getThemes().add(theme);
+            if (rs.next()) {
+                group = new Group();
+                group.setId(rs.getString("id"));
+                group.setName(rs.getString("name"));
+                group.setLastModified(rs.getTimestamp("last").getTime());
+                group.setCreationTimestamp(rs.getTimestamp("creation").getTime());
+                group.setUsers(getUsersByGroupId(id));
+                group.setCollectionThemes(getThemesByGroupId(id));
             }
-            group.setUsers(getUsersByGroupId(id));
         } catch (SQLException e) {
             throw e;
         } finally {
@@ -111,6 +96,43 @@ public class GroupDAOImp implements GroupDAO {
             if (connection != null) connection.close();
         }
         return group;
+    }
+
+    @Override
+    public ThemeCollection getThemesByGroupId(String id) throws SQLException {
+        ThemeCollection collectionThemes = new ThemeCollection();
+        Connection connection = null;
+        PreparedStatement stmt = null;
+        try {
+            connection = Database.getConnection();
+
+            stmt = connection.prepareStatement(GroupDAOQuery.GET_THEMES_BY_GROUP_ID);
+            stmt.setString(1, id);
+
+            ResultSet rs = stmt.executeQuery();
+            boolean first = true;
+            while (rs.next()) {
+                Theme theme = new Theme();
+                theme.setId(rs.getString("id"));
+                theme.setUserid(rs.getString("userid"));
+                theme.setTitle(rs.getString("title"));
+                theme.setContent(rs.getString("content"));
+                theme.setLastModified(rs.getTimestamp("last_modified").getTime());
+                theme.setCreationTimestamp(rs.getTimestamp("creation_timestamp").getTime());
+                if(first) {
+                    collectionThemes.setNewestTimestamp((rs.getTimestamp("last_modified").getTime()));
+                    first = false;
+                }
+                collectionThemes.setOldestTimestamp(rs.getTimestamp("last_modified").getTime());
+                collectionThemes.getThemes().add(theme);
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (stmt != null) stmt.close();
+            if (connection != null) connection.close();
+        }
+        return collectionThemes;
     }
 
     @Override
@@ -219,4 +241,5 @@ public class GroupDAOImp implements GroupDAO {
             if (connection != null) connection.close();
         }
     }
+
 }
