@@ -118,8 +118,8 @@ public class UserDAOImpl implements UserDAO{
                 user.setLoginid(rs.getString("loginid"));
                 user.setEmail(rs.getString("email"));
                 user.setFullname(rs.getString("fullname"));
+                user.setGroups(getGroupsByUserId(id));
             }
-            user.setGroups(getGroupsByUserId(id));
         } catch (SQLException e) {
             // Relanza la excepción
             throw e;
@@ -154,7 +154,6 @@ public class UserDAOImpl implements UserDAO{
                 user.setEmail(rs.getString("email"));
                 user.setFullname(rs.getString("fullname"));
             }
-            user.setGroups(getGroupsByUserId(user.getId()));
         } catch (SQLException e) {
             throw e;
         } finally {

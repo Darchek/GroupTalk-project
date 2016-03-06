@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.glassfish.jersey.linking.InjectLinks;
 
 import javax.ws.rs.core.Link;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +20,10 @@ public class User {
     private String loginid;
     private String email;
     private String fullname;
+
+    public User() {
+        groups = new ArrayList<>();
+    }
 
     public List<Link> getLinks() {
         return links;
