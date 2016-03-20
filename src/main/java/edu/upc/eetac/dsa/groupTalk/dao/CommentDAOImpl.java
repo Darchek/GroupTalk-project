@@ -6,11 +6,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Marti on 05/03/2016.
  */
 public class CommentDAOImpl implements CommentDAO {
+
     @Override
     public Comment createComment(String userid, String themeid, String answer) throws SQLException {
         Connection connection = null;
@@ -70,6 +73,36 @@ public class CommentDAOImpl implements CommentDAO {
             if (connection != null) connection.close();
         }
         return comment;
+    }
+
+    @Override
+    public List<Comment> getCommentsByThemeId(String id) throws SQLException {
+        List<Comment> comments = new ArrayList<>();
+        Connection connection = null;
+        PreparedStatement stmt = null;
+        try {
+            connection = Database.getConnection();
+
+            stmt = connection.prepareStatement(ThemeDAOQuery.GET_COMMENTS_BY_THEME_ID);
+            stmt.setString(1, id);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Comment comment = new Comment();
+                comment.setId(rs.getString("id"));
+                comment.setUserid(rs.getString("userid"));
+                comment.setAnswer(rs.getString("answer"));
+                comment.setLastModified(rs.getTimestamp("last_modified").getTime());
+                comment.setCreationTimestamp(rs.getTimestamp("creation_timestamp").getTime());
+                comments.add(comment);
+            }
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (stmt != null) stmt.close();
+            if (connection != null) connection.close();
+        }
+        return comments;
     }
 
     @Override

@@ -8,11 +8,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Marti on 05/03/2016.
  */
 public class ThemeDAOImpl implements ThemeDAO {
+
     @Override
     public Theme createTheme(String userid, String groupid, String title, String content) throws SQLException {
         Connection connection = null;
@@ -50,6 +53,7 @@ public class ThemeDAOImpl implements ThemeDAO {
     @Override
     public Theme getThemeById(String id) throws SQLException {
         Theme theme = new Theme();
+        CommentDAO commentDAO = new CommentDAOImpl();
         Connection connection = null;
         PreparedStatement stmt = null;
         try {
@@ -59,24 +63,14 @@ public class ThemeDAOImpl implements ThemeDAO {
             stmt.setString(1, id);
 
             ResultSet rs = stmt.executeQuery();
-            boolean first = true;
-            while (rs.next()) {
-                if(first) {
-                    theme.setId(rs.getString("tid"));
-                    theme.setUserid(rs.getString("tuserid"));
-                    theme.setTitle(rs.getString("ttitle"));
-                    theme.setContent(rs.getString("tcontent"));
-                    theme.setLastModified(rs.getTimestamp("tlast").getTime());
-                    theme.setCreationTimestamp(rs.getTimestamp("tcreation").getTime());
-                    first = false;
-                }
-                Comment comment = new Comment();
-                comment.setId(rs.getString("cid"));
-                comment.setUserid(rs.getString("cuserid"));
-                comment.setAnswer(rs.getString("canswer"));
-                comment.setLastModified(rs.getTimestamp("clast").getTime());
-                comment.setCreationTimestamp(rs.getTimestamp("ccreation").getTime());
-                theme.getComments().add(comment);
+            if (rs.next()) {
+                theme.setId(rs.getString("id"));
+                theme.setUserid(rs.getString("userid"));
+                theme.setTitle(rs.getString("title"));
+                theme.setContent(rs.getString("content"));
+                theme.setLastModified(rs.getTimestamp("last_modified").getTime());
+                theme.setCreationTimestamp(rs.getTimestamp("creation_timestamp").getTime());
+                theme.setComments(commentDAO.getCommentsByThemeId(id));
             }
         } catch (SQLException e) {
             throw e;
@@ -88,14 +82,15 @@ public class ThemeDAOImpl implements ThemeDAO {
     }
 
     @Override
-    public ThemeCollection getThemes() throws SQLException {
+    public ThemeCollection getThemesByGroupId(String groupid) throws SQLException {
         ThemeCollection themeCollection = new ThemeCollection();
 
         Connection connection = null;
         PreparedStatement stmt = null;
         try {
             connection = Database.getConnection();
-            stmt = connection.prepareStatement(ThemeDAOQuery.GET_THEMES);
+            stmt = connection.prepareStatement(ThemeDAOQuery.GET_THEMES_BY_GROUP_ID);
+            stmt.setString(1, groupid);
 
             ResultSet rs = stmt.executeQuery();
             boolean first = true;

@@ -1,6 +1,7 @@
 package edu.upc.eetac.dsa.groupTalk.dao;
 
 import edu.upc.eetac.dsa.groupTalk.entity.Group;
+import edu.upc.eetac.dsa.groupTalk.entity.GroupCollection;
 import edu.upc.eetac.dsa.groupTalk.entity.User;
 
 import java.sql.SQLException;
@@ -16,11 +17,12 @@ public interface UserDAO {
 
     public User getUserById(String id) throws SQLException;
 
-    public User getUserByLoginid(String loginid) throws SQLException;
+    public List<User> getUsersByGroupId(String id) throws SQLException;
 
-    public List<Group> getGroupsByUserId(String id) throws SQLException;
+    public User getUserByLoginid(String loginid) throws SQLException;
 
     public boolean deleteUser(String id) throws SQLException;
 
     public boolean checkPassword(String id, String password) throws SQLException;
+
 }

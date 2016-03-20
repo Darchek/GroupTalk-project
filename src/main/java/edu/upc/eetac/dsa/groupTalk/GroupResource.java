@@ -33,7 +33,6 @@ public class GroupResource {
 
         GroupDAO groupDAO = new GroupDAOImpl();
         Group group = null;
-        AuthToken authenticationToken = null;
         try {
             group = groupDAO.createGroup(securityContext.getUserPrincipal().getName(), name);
         } catch (SQLException e) {
@@ -53,14 +52,13 @@ public class GroupResource {
         } catch (SQLException e) {
             throw new InternalServerErrorException();
         }
-
         return groupCollection;
     }
 
     @Path("/{id}")
     @GET
     @Produces(GroupTalkMediaType.GROUPTALK_GROUP)
-    public Group getGroup(@PathParam("id") String id){
+    public Group getGroupById(@PathParam("id") String id){
         Group group = null;
         GroupDAO groupDAO = new GroupDAOImpl();
         try {
@@ -100,7 +98,6 @@ public class GroupResource {
     @Path("/{id}")
     @DELETE
     public void deleteGroup(@PathParam("id") String id) {
-        String userid = securityContext.getUserPrincipal().getName();
         GroupDAO groupDAO = new GroupDAOImpl();
         try {
             if(!securityContext.isUserInRole("administrator"))

@@ -71,6 +71,8 @@ public class GroupDAOImpl implements GroupDAO {
     @Override
     public Group getGroupById(String id) throws SQLException {
         Group group = null;
+        UserDAO userDAO = new UserDAOImpl();
+        ThemeDAO themeDAO = new ThemeDAOImpl();
         Connection connection = null;
         PreparedStatement stmt = null;
         try {
@@ -86,8 +88,8 @@ public class GroupDAOImpl implements GroupDAO {
                 group.setName(rs.getString("name"));
                 group.setLastModified(rs.getTimestamp("last").getTime());
                 group.setCreationTimestamp(rs.getTimestamp("creation").getTime());
-                group.setUsers(getUsersByGroupId(id));
-                group.setCollectionThemes(getThemesByGroupId(id));
+                group.setUsers(userDAO.getUsersByGroupId(id));
+                group.setCollectionThemes(themeDAO.getThemesByGroupId(id));
             }
         } catch (SQLException e) {
             throw e;
@@ -99,32 +101,30 @@ public class GroupDAOImpl implements GroupDAO {
     }
 
     @Override
-    public ThemeCollection getThemesByGroupId(String id) throws SQLException {
-        ThemeCollection collectionThemes = new ThemeCollection();
+    public GroupCollection getGroupsByUserId(String id) throws SQLException {
+        GroupCollection groups = new GroupCollection();
         Connection connection = null;
         PreparedStatement stmt = null;
         try {
             connection = Database.getConnection();
 
-            stmt = connection.prepareStatement(GroupDAOQuery.GET_THEMES_BY_GROUP_ID);
+            stmt = connection.prepareStatement(UserDAOQuery.GET_GROUPS_BY_USER_ID);
             stmt.setString(1, id);
 
             ResultSet rs = stmt.executeQuery();
             boolean first = true;
             while (rs.next()) {
-                Theme theme = new Theme();
-                theme.setId(rs.getString("id"));
-                theme.setUserid(rs.getString("userid"));
-                theme.setTitle(rs.getString("title"));
-                theme.setContent(rs.getString("content"));
-                theme.setLastModified(rs.getTimestamp("last_modified").getTime());
-                theme.setCreationTimestamp(rs.getTimestamp("creation_timestamp").getTime());
-                if(first) {
-                    collectionThemes.setNewestTimestamp((rs.getTimestamp("last_modified").getTime()));
+                Group group = new Group();
+                group.setId(rs.getString("id"));
+                group.setName(rs.getString("name"));
+                group.setLastModified(rs.getTimestamp("last_modified").getTime());
+                group.setCreationTimestamp(rs.getTimestamp("creation_timestamp").getTime());
+                if (first) {
+                    groups.setNewestTimestamp(group.getLastModified());
                     first = false;
                 }
-                collectionThemes.setOldestTimestamp(rs.getTimestamp("last_modified").getTime());
-                collectionThemes.getThemes().add(theme);
+                groups.setOldestTimestamp(group.getLastModified());
+                groups.getGroups().add(group);
             }
         } catch (SQLException e) {
             throw e;
@@ -132,36 +132,7 @@ public class GroupDAOImpl implements GroupDAO {
             if (stmt != null) stmt.close();
             if (connection != null) connection.close();
         }
-        return collectionThemes;
-    }
-
-    @Override
-    public List<User> getUsersByGroupId(String id) throws SQLException {
-        List<User> users = new ArrayList<>();
-        Connection connection = null;
-        PreparedStatement stmt = null;
-        try {
-            connection = Database.getConnection();
-
-            stmt = connection.prepareStatement(GroupDAOQuery.GET_USERS_BY_GROUP_ID);
-            stmt.setString(1, id);
-
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                User user = new User();
-                user.setId(rs.getString("id"));
-                user.setLoginid(rs.getString("loginid"));
-                user.setEmail(rs.getString("email"));
-                user.setFullname(rs.getString("fullname"));
-                users.add(user);
-            }
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-            if (stmt != null) stmt.close();
-            if (connection != null) connection.close();
-        }
-        return users;
+        return groups;
     }
 
     @Override
@@ -240,6 +211,29 @@ public class GroupDAOImpl implements GroupDAO {
             if (stmt != null) stmt.close();
             if (connection != null) connection.close();
         }
+    }
+
+    @Override
+    public boolean isUserSubscribe(String userid, String groupid) throws SQLException {
+        boolean isSubscribe = false;
+        Connection connection = null;
+        PreparedStatement stmt = null;
+        try {
+            connection = Database.getConnection();
+
+            stmt = connection.prepareStatement(GroupDAOQuery.CHECK_USER_SUBSCRIBE);
+            stmt.setString(1, userid);
+            stmt.setString(2, groupid);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next())
+                isSubscribe = true;
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if (stmt != null) stmt.close();
+            if (connection != null) connection.close();
+        }
+        return isSubscribe;
     }
 
 }

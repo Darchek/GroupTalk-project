@@ -14,17 +14,17 @@ import java.util.List;
 public interface GroupDAO {
     public Group createGroup(String userid, String name) throws SQLException;
 
-    public boolean subscribeGroup(String groupid, String userid) throws SQLException;
-
     public Group getGroupById(String id) throws SQLException;
 
-    public ThemeCollection getThemesByGroupId(String id) throws SQLException;
-
-    public List<User> getUsersByGroupId(String id) throws SQLException;
+    public GroupCollection getGroupsByUserId(String id) throws SQLException;
 
     public GroupCollection getGroups() throws SQLException;
 
     public Group updateGroup(String id, String name) throws SQLException;
 
+    public boolean subscribeGroup(String groupid, String userid) throws SQLException;
+
     public boolean deleteGroup(String id) throws SQLException;
+
+    public boolean isUserSubscribe(String userid, String groupid) throws SQLException;
 }

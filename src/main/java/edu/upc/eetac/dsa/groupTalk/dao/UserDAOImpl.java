@@ -1,6 +1,7 @@
 package edu.upc.eetac.dsa.groupTalk.dao;
 
 import edu.upc.eetac.dsa.groupTalk.entity.Group;
+import edu.upc.eetac.dsa.groupTalk.entity.GroupCollection;
 import edu.upc.eetac.dsa.groupTalk.entity.User;
 
 import java.math.BigInteger;
@@ -97,7 +98,7 @@ public class UserDAOImpl implements UserDAO{
     public User getUserById(String id) throws SQLException {
         // Modelo a devolver
         User user = null;
-
+        GroupDAO groupDAO = new GroupDAOImpl();
         Connection connection = null;
         PreparedStatement stmt = null;
         try {
@@ -118,7 +119,7 @@ public class UserDAOImpl implements UserDAO{
                 user.setLoginid(rs.getString("loginid"));
                 user.setEmail(rs.getString("email"));
                 user.setFullname(rs.getString("fullname"));
-                user.setGroups(getGroupsByUserId(id));
+                user.setGroups(groupDAO.getGroupsByUserId(id).getGroups());
             }
         } catch (SQLException e) {
             // Relanza la excepción
@@ -165,24 +166,24 @@ public class UserDAOImpl implements UserDAO{
     }
 
     @Override
-    public List<Group> getGroupsByUserId(String id) throws SQLException {
-        List<Group> groups = new ArrayList<>();
+    public List<User> getUsersByGroupId(String id) throws SQLException {
+        List<User> users = new ArrayList<>();
         Connection connection = null;
         PreparedStatement stmt = null;
         try {
             connection = Database.getConnection();
 
-            stmt = connection.prepareStatement(UserDAOQuery.GET_GROUPS_BY_USER_ID);
+            stmt = connection.prepareStatement(GroupDAOQuery.GET_USERS_BY_GROUP_ID);
             stmt.setString(1, id);
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                Group group = new Group();
-                group.setId(rs.getString("id"));
-                group.setName(rs.getString("name"));
-                group.setLastModified(rs.getTimestamp("last_modified").getTime());
-                group.setCreationTimestamp(rs.getTimestamp("creation_timestamp").getTime());
-                groups.add(group);
+                User user = new User();
+                user.setId(rs.getString("id"));
+                user.setLoginid(rs.getString("loginid"));
+                user.setEmail(rs.getString("email"));
+                user.setFullname(rs.getString("fullname"));
+                users.add(user);
             }
         } catch (SQLException e) {
             throw e;
@@ -190,7 +191,7 @@ public class UserDAOImpl implements UserDAO{
             if (stmt != null) stmt.close();
             if (connection != null) connection.close();
         }
-        return groups;
+        return users;
     }
 
     @Override
@@ -243,4 +244,5 @@ public class UserDAOImpl implements UserDAO{
             if (connection != null) connection.close();
         }
     }
+
 }
