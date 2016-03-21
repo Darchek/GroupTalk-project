@@ -65,9 +65,9 @@ public class ThemeResource {
     @Path("/{id}")
     @GET
     @Produces(GroupTalkMediaType.GROUPTALK_THEME)
-    public Theme getThemeById(@PathParam("id") String id) {
+    public Response getThemeById(@PathParam("id") String id, @Context Request request) {
+        CacheControl cacheControl = new CacheControl();
         Theme theme = null;
-        GroupDAO group = new GroupDAOImpl();
         ThemeDAO themeDAO = new ThemeDAOImpl();
         try {
             theme = themeDAO.getThemeById(id);
@@ -75,10 +75,16 @@ public class ThemeResource {
                 throw new NotFoundException("Theme with id = " + id +" doesn't exist");
             if (!isUserSubscribeOrAdmin(theme.getGroupid()))
                 throw new ForbiddenException("operation not allowed - Need Subscribe to Group");
+            EntityTag eTag = new EntityTag(Long.toString(theme.getLastModified()));
+            Response.ResponseBuilder rb = request.evaluatePreconditions(eTag);
+            if (rb != null) {
+                return rb.cacheControl(cacheControl).tag(eTag).build();
+            }
+            rb = Response.ok(theme).cacheControl(cacheControl).tag(eTag);
+            return rb.build();
         } catch (SQLException e) {
             throw new InternalServerErrorException();
         }
-        return theme;
     }
 
     @Path("/{id}")
