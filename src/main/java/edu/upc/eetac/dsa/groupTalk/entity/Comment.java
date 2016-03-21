@@ -16,6 +16,7 @@ public class Comment {
     private List<Link> links;
     private String id;
     private String userid;
+    private String themeid;
     private String answer;
     private long creationTimestamp;
     private long lastModified;
@@ -42,6 +43,14 @@ public class Comment {
 
     public void setUserid(String userid) {
         this.userid = userid;
+    }
+
+    public String getThemeid() {
+        return themeid;
+    }
+
+    public void setThemeid(String themeid) {
+        this.themeid = themeid;
     }
 
     public String getAnswer() {

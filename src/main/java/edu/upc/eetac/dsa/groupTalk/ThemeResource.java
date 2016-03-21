@@ -17,16 +17,16 @@ import java.sql.SQLException;
 /**
  * Created by Marti on 06/03/2016.
  */
-//@Path("theme")
+@Path("themes")
 public class ThemeResource {
 
     @Context
     private SecurityContext securityContext;
 
-    @Path("theme")
+
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(GroupTalkMediaType.GROUPTALK_GROUP)
+    @Produces(GroupTalkMediaType.GROUPTALK_THEME)
     public Response createTheme(@FormParam("groupid") String groupid, @FormParam("title") String title, @FormParam("content") String content, @Context UriInfo uriInfo) throws URISyntaxException {
         if (groupid == null || title == null || content == null)
             throw new BadRequestException("all parameters are mandatory");
@@ -35,11 +35,8 @@ public class ThemeResource {
         ThemeDAO themeDAO = new ThemeDAOImpl();
         Theme theme = null;
         try {
-            if(!securityContext.isUserInRole("administrator")) {
-                if (!group.isUserSubscribe(securityContext.getUserPrincipal().getName(), groupid))
-                    throw new ForbiddenException("operation not allowed - Need Subscribe to Group");
-                throw new ForbiddenException("operation not allowed - Only Administrators");
-            }
+            if (!isUserSubscribeOrAdmin(groupid))
+                throw new ForbiddenException("operation not allowed - Need Subscribe to Group");
             theme = themeDAO.createTheme(securityContext.getUserPrincipal().getName(), groupid, title, content);
         } catch (SQLException e) {
             throw new InternalServerErrorException();
@@ -48,7 +45,7 @@ public class ThemeResource {
         return Response.created(uri).type(GroupTalkMediaType.GROUPTALK_THEME).entity(theme).build();
     }
 
-    @Path("themes/{groupid}")
+    @Path("group/{groupid}")
     @GET
     @Produces(GroupTalkMediaType.GROUPTALK_THEME_COLLECTION)
     public ThemeCollection getThemesByGroupId(@PathParam("groupid") String groupid) {
@@ -56,11 +53,8 @@ public class ThemeResource {
         GroupDAO group = new GroupDAOImpl();
         ThemeDAO themeDAO = new ThemeDAOImpl();
         try {
-            if(!securityContext.isUserInRole("administrator")) {
-                if (!group.isUserSubscribe(securityContext.getUserPrincipal().getName(), groupid))
-                    throw new ForbiddenException("operation not allowed - Need Subscribe to Group");
-                throw new ForbiddenException("operation not allowed - Only Administrators");
-            }
+            if (!isUserSubscribeOrAdmin(groupid))
+                throw new ForbiddenException("operation not allowed - Need Subscribe to Group");
             themeCollection = themeDAO.getThemesByGroupId(groupid);
         } catch (SQLException e) {
             throw new InternalServerErrorException();
@@ -68,7 +62,7 @@ public class ThemeResource {
         return themeCollection;
     }
 
-    @Path("theme/{id}")
+    @Path("/{id}")
     @GET
     @Produces(GroupTalkMediaType.GROUPTALK_THEME)
     public Theme getThemeById(@PathParam("id") String id) {
@@ -76,23 +70,22 @@ public class ThemeResource {
         GroupDAO group = new GroupDAOImpl();
         ThemeDAO themeDAO = new ThemeDAOImpl();
         try {
-            if(!securityContext.isUserInRole("administrator")) {
-                if (!group.isUserSubscribe(securityContext.getUserPrincipal().getName(), id))
-                    throw new ForbiddenException("operation not allowed - Need Subscribe to Group");
-                throw new ForbiddenException("operation not allowed - Only Administrators");
-            }
             theme = themeDAO.getThemeById(id);
+            if(theme == null)
+                throw new NotFoundException("Theme with id = " + id +" doesn't exist");
+            if (!isUserSubscribeOrAdmin(theme.getGroupid()))
+                throw new ForbiddenException("operation not allowed - Need Subscribe to Group");
         } catch (SQLException e) {
             throw new InternalServerErrorException();
         }
         return theme;
     }
 
-    @Path("theme/{id}")
+    @Path("/{id}")
     @PUT
     @Consumes(GroupTalkMediaType.GROUPTALK_THEME)
     @Produces(GroupTalkMediaType.GROUPTALK_THEME)
-    public Theme updateGroup(@PathParam("id") String id, Theme theme) {
+    public Theme updateTheme(@PathParam("id") String id, Theme theme) {
         GroupDAO groupDAO = new GroupDAOImpl();
         ThemeDAO themeDAO = new ThemeDAOImpl();
         if(theme == null)
@@ -100,11 +93,8 @@ public class ThemeResource {
         if(!id.equals(theme.getId()))
             throw new BadRequestException("path parameter id and entity parameter id doesn't match");
         try {
-            if(!securityContext.isUserInRole("administrator")) {
-                if (!groupDAO.isUserSubscribe(securityContext.getUserPrincipal().getName(), id))
-                    throw new ForbiddenException("operation not allowed - Need Subscribe to Group");
-                throw new ForbiddenException("operation not allowed - Only Administrators");
-            }
+            if (!isUserSubscribeOrAdmin(theme.getGroupid()))
+                throw new ForbiddenException("operation not allowed - Need Subscribe to Group");
             theme = themeDAO.updateTheme(id, theme.getTitle(), theme.getContent());
             if(theme == null)
                 throw new NotFoundException("Theme with id = "+id+" doesn't exist");
@@ -114,21 +104,33 @@ public class ThemeResource {
         return theme;
     }
 
-    @Path("theme/{id}")
+    @Path("/{id}")
     @DELETE
-    public void deleteGroup(@PathParam("id") String id) {
+    public void deleteTheme(@PathParam("id") String id) {
         ThemeDAO themeDAO = new ThemeDAOImpl();
         GroupDAO groupDAO = new GroupDAOImpl();
+        Theme theme = null;
         try {
-            if(!securityContext.isUserInRole("administrator")) {
-                if (!groupDAO.isUserSubscribe(securityContext.getUserPrincipal().getName(), id))
-                    throw new ForbiddenException("operation not allowed - Need Subscribe to Group");
-                throw new ForbiddenException("operation not allowed - Only Administrators");
-            }
+            theme = themeDAO.getThemeById(id);
+            if (!isUserSubscribeOrAdmin(theme.getGroupid()))
+                throw new ForbiddenException("operation not allowed - Need Subscribe to Group");
             if(!themeDAO.deleteTheme(id))
                 throw new NotFoundException("Theme with id = "+id+" doesn't exist");
         } catch (SQLException e) {
             throw new InternalServerErrorException();
         }
     }
+
+
+    public boolean isUserSubscribeOrAdmin(String groupid) {
+        if(securityContext.isUserInRole("administrator"))
+            return true;
+        GroupDAO groupDAO = new GroupDAOImpl();
+        try {
+            return groupDAO.isUserSubscribe(securityContext.getUserPrincipal().getName(), groupid);
+        } catch (SQLException e) {
+            throw new InternalServerErrorException();
+        }
+    }
+
 }

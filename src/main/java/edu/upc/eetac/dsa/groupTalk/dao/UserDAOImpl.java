@@ -173,7 +173,7 @@ public class UserDAOImpl implements UserDAO{
         try {
             connection = Database.getConnection();
 
-            stmt = connection.prepareStatement(GroupDAOQuery.GET_USERS_BY_GROUP_ID);
+            stmt = connection.prepareStatement(UserDAOQuery.GET_USERS_BY_GROUP_ID);
             stmt.setString(1, id);
 
             ResultSet rs = stmt.executeQuery();

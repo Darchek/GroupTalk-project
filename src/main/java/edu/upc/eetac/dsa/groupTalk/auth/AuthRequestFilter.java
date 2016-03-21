@@ -1,6 +1,8 @@
 package edu.upc.eetac.dsa.groupTalk.auth;
 
 import edu.upc.eetac.dsa.groupTalk.dao.AuthTokenDAOImpl;
+import edu.upc.eetac.dsa.groupTalk.dao.GroupDAO;
+import edu.upc.eetac.dsa.groupTalk.dao.GroupDAOImpl;
 import edu.upc.eetac.dsa.groupTalk.entity.Role;
 
 import javax.annotation.Priority;
@@ -36,6 +38,7 @@ public class AuthRequestFilter implements ContainerRequestFilter {
             if(principal==null)
                 throw new WebApplicationException("auth token doesn't exists", Response.Status.UNAUTHORIZED);
             requestContext.setSecurityContext(new SecurityContext() {
+
                 @Override
                 public Principal getUserPrincipal() {
                     return principal;

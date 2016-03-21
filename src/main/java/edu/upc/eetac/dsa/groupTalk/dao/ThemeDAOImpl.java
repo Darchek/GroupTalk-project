@@ -52,7 +52,7 @@ public class ThemeDAOImpl implements ThemeDAO {
 
     @Override
     public Theme getThemeById(String id) throws SQLException {
-        Theme theme = new Theme();
+        Theme theme = null;
         CommentDAO commentDAO = new CommentDAOImpl();
         Connection connection = null;
         PreparedStatement stmt = null;
@@ -64,8 +64,10 @@ public class ThemeDAOImpl implements ThemeDAO {
 
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
+                theme = new Theme();
                 theme.setId(rs.getString("id"));
                 theme.setUserid(rs.getString("userid"));
+                theme.setGroupid(rs.getString("groupid"));
                 theme.setTitle(rs.getString("title"));
                 theme.setContent(rs.getString("content"));
                 theme.setLastModified(rs.getTimestamp("last_modified").getTime());
@@ -98,6 +100,7 @@ public class ThemeDAOImpl implements ThemeDAO {
                 Theme theme = new Theme();
                 theme.setId(rs.getString("id"));
                 theme.setUserid(rs.getString("userid"));
+                theme.setGroupid(rs.getString("groupid"));
                 theme.setTitle(rs.getString("title"));
                 theme.setContent(rs.getString("content"));
                 theme.setCreationTimestamp(rs.getTimestamp("creation_timestamp").getTime());

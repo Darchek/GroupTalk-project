@@ -16,6 +16,7 @@ public class Theme {
     private List<Comment> comments;
     private String id;
     private String userid;
+    private String groupid;
     private String title;
     private String content;
     private long creationTimestamp;
@@ -51,6 +52,14 @@ public class Theme {
 
     public void setUserid(String userid) {
         this.userid = userid;
+    }
+
+    public String getGroupid() {
+        return groupid;
+    }
+
+    public void setGroupid(String groupid) {
+        this.groupid = groupid;
     }
 
     public String getTitle() {

@@ -108,7 +108,7 @@ public class GroupDAOImpl implements GroupDAO {
         try {
             connection = Database.getConnection();
 
-            stmt = connection.prepareStatement(UserDAOQuery.GET_GROUPS_BY_USER_ID);
+            stmt = connection.prepareStatement(GroupDAOQuery.GET_GROUPS_BY_USER_ID);
             stmt.setString(1, id);
 
             ResultSet rs = stmt.executeQuery();

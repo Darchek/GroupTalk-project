@@ -62,6 +62,7 @@ public class CommentDAOImpl implements CommentDAO {
             if (rs.next()) {
                 comment.setId(rs.getString("id"));
                 comment.setUserid(rs.getString("userid"));
+                comment.setThemeid(rs.getString("themeid"));
                 comment.setAnswer(rs.getString("answer"));
                 comment.setLastModified(rs.getTimestamp("last_modified").getTime());
                 comment.setCreationTimestamp(rs.getTimestamp("creation_timestamp").getTime());
@@ -83,7 +84,7 @@ public class CommentDAOImpl implements CommentDAO {
         try {
             connection = Database.getConnection();
 
-            stmt = connection.prepareStatement(ThemeDAOQuery.GET_COMMENTS_BY_THEME_ID);
+            stmt = connection.prepareStatement(CommentDAOQuery.GET_COMMENTS_BY_THEME_ID);
             stmt.setString(1, id);
 
             ResultSet rs = stmt.executeQuery();
@@ -91,6 +92,7 @@ public class CommentDAOImpl implements CommentDAO {
                 Comment comment = new Comment();
                 comment.setId(rs.getString("id"));
                 comment.setUserid(rs.getString("userid"));
+                comment.setThemeid(rs.getString("themeid"));
                 comment.setAnswer(rs.getString("answer"));
                 comment.setLastModified(rs.getTimestamp("last_modified").getTime());
                 comment.setCreationTimestamp(rs.getTimestamp("creation_timestamp").getTime());
