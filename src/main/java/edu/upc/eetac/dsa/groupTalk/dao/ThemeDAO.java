@@ -16,7 +16,7 @@ public interface ThemeDAO {
 
     public Theme getThemeById(String id) throws SQLException;
 
-    public ThemeCollection getThemesByGroupId(String groupid) throws SQLException;
+    public ThemeCollection getThemesByGroupId(String groupid, long timestamp, boolean before) throws SQLException;
 
     public Theme updateTheme(String id, String title, String content) throws SQLException;
 

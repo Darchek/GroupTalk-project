@@ -4,10 +4,7 @@ import edu.upc.eetac.dsa.groupTalk.entity.Comment;
 import edu.upc.eetac.dsa.groupTalk.entity.Theme;
 import edu.upc.eetac.dsa.groupTalk.entity.ThemeCollection;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,15 +81,19 @@ public class ThemeDAOImpl implements ThemeDAO {
     }
 
     @Override
-    public ThemeCollection getThemesByGroupId(String groupid) throws SQLException {
+    public ThemeCollection getThemesByGroupId(String groupid, long timestamp, boolean before) throws SQLException {
         ThemeCollection themeCollection = new ThemeCollection();
 
         Connection connection = null;
         PreparedStatement stmt = null;
         try {
             connection = Database.getConnection();
-            stmt = connection.prepareStatement(ThemeDAOQuery.GET_THEMES_BY_GROUP_ID);
+            if(before)
+                stmt = connection.prepareStatement(ThemeDAOQuery.GET_THEMES_BY_GROUP_ID);
+            else
+                stmt = connection.prepareStatement(ThemeDAOQuery.GET_THEMES_BY_GROUP_ID_AFTER);
             stmt.setString(1, groupid);
+            stmt.setTimestamp(2, new Timestamp(timestamp));
 
             ResultSet rs = stmt.executeQuery();
             boolean first = true;

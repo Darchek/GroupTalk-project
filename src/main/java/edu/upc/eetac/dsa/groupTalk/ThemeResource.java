@@ -48,14 +48,14 @@ public class ThemeResource {
     @Path("group/{groupid}")
     @GET
     @Produces(GroupTalkMediaType.GROUPTALK_THEME_COLLECTION)
-    public ThemeCollection getThemesByGroupId(@PathParam("groupid") String groupid) {
+    public ThemeCollection getThemesByGroupId(@PathParam("groupid") String groupid, @QueryParam("timestamp") long timestamp, @DefaultValue("true") @QueryParam("before") boolean before) {
         ThemeCollection themeCollection = null;
-        GroupDAO group = new GroupDAOImpl();
         ThemeDAO themeDAO = new ThemeDAOImpl();
         try {
             if (!isUserSubscribeOrAdmin(groupid))
                 throw new ForbiddenException("operation not allowed - Need Subscribe to Group");
-            themeCollection = themeDAO.getThemesByGroupId(groupid);
+            if (before && timestamp == 0) timestamp = System.currentTimeMillis();
+            themeCollection = themeDAO.getThemesByGroupId(groupid, timestamp, before);
         } catch (SQLException e) {
             throw new InternalServerErrorException();
         }

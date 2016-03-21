@@ -89,7 +89,7 @@ public class GroupDAOImpl implements GroupDAO {
                 group.setLastModified(rs.getTimestamp("last").getTime());
                 group.setCreationTimestamp(rs.getTimestamp("creation").getTime());
                 group.setUsers(userDAO.getUsersByGroupId(id));
-                group.setCollectionThemes(themeDAO.getThemesByGroupId(id));
+                group.setCollectionThemes(themeDAO.getThemesByGroupId(id, System.currentTimeMillis(), true));
             }
         } catch (SQLException e) {
             throw e;
