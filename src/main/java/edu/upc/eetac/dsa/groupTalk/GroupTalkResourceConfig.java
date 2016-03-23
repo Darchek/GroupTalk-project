@@ -12,6 +12,7 @@ public class GroupTalkResourceConfig extends ResourceConfig {
     public GroupTalkResourceConfig() {
         packages("edu.upc.eetac.dsa.groupTalk");
         packages("edu.upc.eetac.dsa.groupTalk.auth");
+        packages("edu.upc.eetac.dsa.beeter.cors");
         register(RolesAllowedDynamicFeature.class);
         register(DeclarativeLinkingFeature.class);
     }
