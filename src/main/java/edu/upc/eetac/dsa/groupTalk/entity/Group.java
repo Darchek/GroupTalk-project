@@ -1,9 +1,13 @@
 package edu.upc.eetac.dsa.groupTalk.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import edu.upc.eetac.dsa.groupTalk.*;
+import org.glassfish.jersey.linking.Binding;
+import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
 
 import javax.ws.rs.core.Link;
+import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 /**
@@ -11,7 +15,16 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Group {
-    @InjectLinks({})
+    @InjectLinks({
+            @InjectLink(resource = GroupTalkRootAPIResource.class, style = InjectLink.Style.ABSOLUTE, rel = "home", title = "GroupTalk Root API"),
+            @InjectLink(resource = GroupResource.class, style = InjectLink.Style.ABSOLUTE, rel = "current-group", title = "Current group"),
+            @InjectLink(resource = GroupResource.class, style = InjectLink.Style.ABSOLUTE, rel = "create-group", title = "Create group", type = MediaType.APPLICATION_FORM_URLENCODED), //ONLY ADMIN
+            @InjectLink(resource = GroupResource.class, method = "getGroupById", style = InjectLink.Style.ABSOLUTE, rel = "self group", title = "Group", bindings = @Binding(name = "id", value = "${instance.id}")),
+            @InjectLink(resource = GroupResource.class, style = InjectLink.Style.ABSOLUTE, rel = "subscribe-group", title = "Subscribe group", type = MediaType.APPLICATION_FORM_URLENCODED),
+            @InjectLink(resource = ThemeResource.class, style = InjectLink.Style.ABSOLUTE, rel = "current-theme", title = "Current theme"),
+            @InjectLink(resource = ThemeResource.class, style = InjectLink.Style.ABSOLUTE, rel = "create-theme", title = "Create theme", type = MediaType.APPLICATION_FORM_URLENCODED),
+            @InjectLink(resource = LoginResource.class, style = InjectLink.Style.ABSOLUTE, rel = "logout", title = "Logout")
+    })
     private List<Link> links;
     private List<User> users;
     private ThemeCollection collectionThemes;

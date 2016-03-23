@@ -1,5 +1,6 @@
 package edu.upc.eetac.dsa.groupTalk;
 
+import edu.upc.eetac.dsa.groupTalk.auth.UserInfo;
 import edu.upc.eetac.dsa.groupTalk.dao.AuthTokenDAO;
 import edu.upc.eetac.dsa.groupTalk.dao.AuthTokenDAOImpl;
 import edu.upc.eetac.dsa.groupTalk.dao.UserDAO;
@@ -42,6 +43,8 @@ public class LoginResource {
             AuthTokenDAO authTokenDAO = new AuthTokenDAOImpl();
             authTokenDAO.deleteToken(user.getId());
             authToken = authTokenDAO.createAuthToken(user.getId());
+            final UserInfo principal = (new AuthTokenDAOImpl()).getUserByAuthToken(authToken.getToken());
+            authToken.setIsAdmin(principal);
         }catch(SQLException e){
             throw new InternalServerErrorException();
         }

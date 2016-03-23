@@ -95,6 +95,22 @@ public class GroupResource {
         return group;
     }
 
+    @Path("subscribe")
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public void subscribeGroup(@FormParam("id") String id) {
+        if(id == null)
+            throw new BadRequestException("entity is null");
+
+        GroupDAO groupDAO = new GroupDAOImpl();
+        try {
+            if(!groupDAO.subscribeGroup(id, securityContext.getUserPrincipal().getName()))
+                throw new NotFoundException("Group with id = " + id + " doesn't exist");
+        } catch (SQLException e) {
+            throw new InternalServerErrorException();
+        }
+    }
+
     @Path("/{id}")
     @DELETE
     public void deleteGroup(@PathParam("id") String id) {

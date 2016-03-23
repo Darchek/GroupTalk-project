@@ -1,6 +1,9 @@
 package edu.upc.eetac.dsa.groupTalk.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import edu.upc.eetac.dsa.groupTalk.*;
+import org.glassfish.jersey.linking.Binding;
+import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
 
 import javax.ws.rs.core.Link;
@@ -12,8 +15,13 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class User {
-
-    @InjectLinks({})
+    @InjectLinks({
+            @InjectLink(resource = GroupTalkRootAPIResource.class, style = InjectLink.Style.ABSOLUTE, rel = "home", title = "GroupTalk Root API"),
+            @InjectLink(resource = GroupResource.class, style = InjectLink.Style.ABSOLUTE, rel = "current-group", title = "Current group", type= GroupTalkMediaType.GROUPTALK_GROUP_COLLECTION),
+            @InjectLink(resource = LoginResource.class, style = InjectLink.Style.ABSOLUTE, rel = "logout", title = "Logout"),
+            @InjectLink(resource = GroupResource.class, style = InjectLink.Style.ABSOLUTE, rel = "create-group", title = "Create group", type=GroupTalkMediaType.GROUPTALK_GROUP), //ONLY ADMIN
+            @InjectLink(resource = UserResource.class, method = "getUser", style = InjectLink.Style.ABSOLUTE, rel = "self user-profile", title = "User profile", type= GroupTalkMediaType.GROUPTALK_USER, bindings = @Binding(name = "id", value = "${instance.id}"))
+    })
     private List<Link> links;
     private List<Group> groups;
     private String id;

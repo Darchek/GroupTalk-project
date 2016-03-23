@@ -1,9 +1,13 @@
 package edu.upc.eetac.dsa.groupTalk.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import edu.upc.eetac.dsa.groupTalk.*;
+import org.glassfish.jersey.linking.Binding;
+import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
 
 import javax.ws.rs.core.Link;
+import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 /**
@@ -11,7 +15,18 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Theme {
-    @InjectLinks({})
+    @InjectLinks({
+            @InjectLink(resource = GroupTalkRootAPIResource.class, style = InjectLink.Style.ABSOLUTE, rel = "home", title = "GroupTalk Root API"),
+            @InjectLink(resource = ThemeResource.class, style = InjectLink.Style.ABSOLUTE, rel = "current-theme", title = "Current theme"),
+            @InjectLink(resource = ThemeResource.class, style = InjectLink.Style.ABSOLUTE, rel = "create-theme", title = "Create theme", type = MediaType.APPLICATION_FORM_URLENCODED),
+            @InjectLink(resource = ThemeResource.class, method = "getThemeById", style = InjectLink.Style.ABSOLUTE, rel = "self theme", title = "Theme", bindings = @Binding(name = "id", value = "${instance.id}")),
+            @InjectLink(resource = ThemeResource.class, method = "getThemesByGroupId", style = InjectLink.Style.ABSOLUTE, rel = "next", title = "Newer themes", bindings = {@Binding(name = "groupid", value = "${instance.groupid}"), @Binding(name = "timestamp", value = "${instance.creationTimestamp}"), @Binding(name = "before", value = "false")}),
+            @InjectLink(resource = ThemeResource.class, method = "getThemesByGroupId", style = InjectLink.Style.ABSOLUTE, rel = "previous", title = "Older themes", bindings = {@Binding(name = "groupid", value = "${instance.groupid}"), @Binding(name = "timestamp", value = "${instance.creationTimestamp}"), @Binding(name = "before", value = "true")}),
+            @InjectLink(resource = UserResource.class, method = "getUser", style = InjectLink.Style.ABSOLUTE, rel = "user-profile", title = "User profile", bindings = @Binding(name = "id", value = "${instance.userid}")),
+            @InjectLink(resource = CommentResource.class, style = InjectLink.Style.ABSOLUTE, rel = "current-comment", title = "Current comment"),
+            @InjectLink(resource = CommentResource.class, style = InjectLink.Style.ABSOLUTE, rel = "create-comment", title = "Create comment", type = MediaType.APPLICATION_FORM_URLENCODED),
+            @InjectLink(resource = LoginResource.class, style = InjectLink.Style.ABSOLUTE, rel = "logout", title = "Logout")
+    })
     private List<Link> links;
     private List<Comment> comments;
     private String id;

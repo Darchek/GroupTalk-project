@@ -56,6 +56,7 @@ public class ThemeResource {
                 throw new ForbiddenException("operation not allowed - Need Subscribe to Group");
             if (before && timestamp == 0) timestamp = System.currentTimeMillis();
             themeCollection = themeDAO.getThemesByGroupId(groupid, timestamp, before);
+            themeCollection.setGroupid(groupid);
         } catch (SQLException e) {
             throw new InternalServerErrorException();
         }

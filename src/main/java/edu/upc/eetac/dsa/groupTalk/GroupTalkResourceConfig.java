@@ -1,5 +1,6 @@
 package edu.upc.eetac.dsa.groupTalk;
 
+import org.glassfish.jersey.linking.DeclarativeLinkingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
@@ -12,5 +13,6 @@ public class GroupTalkResourceConfig extends ResourceConfig {
         packages("edu.upc.eetac.dsa.groupTalk");
         packages("edu.upc.eetac.dsa.groupTalk.auth");
         register(RolesAllowedDynamicFeature.class);
+        register(DeclarativeLinkingFeature.class);
     }
 }

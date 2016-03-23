@@ -1,9 +1,13 @@
 package edu.upc.eetac.dsa.groupTalk.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import edu.upc.eetac.dsa.groupTalk.*;
+import org.glassfish.jersey.linking.Binding;
+import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
 
 import javax.ws.rs.core.Link;
+import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 /**
@@ -12,7 +16,14 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Comment {
 
-    @InjectLinks({})
+    @InjectLinks({
+            @InjectLink(resource = GroupTalkRootAPIResource.class, style = InjectLink.Style.ABSOLUTE, rel = "home", title = "GroupTalk Root API"),
+            @InjectLink(resource = CommentResource.class, style = InjectLink.Style.ABSOLUTE, rel = "current-comment", title = "Current comment"),
+            @InjectLink(resource = CommentResource.class, style = InjectLink.Style.ABSOLUTE, rel = "create-comment", title = "Create comment", type = MediaType.APPLICATION_FORM_URLENCODED),
+            @InjectLink(resource = CommentResource.class, method = "getCommentById", style = InjectLink.Style.ABSOLUTE, rel = "self comment", title = "Comment", bindings = @Binding(name = "id", value = "${instance.id}")),
+            @InjectLink(resource = UserResource.class, method = "getUser", style = InjectLink.Style.ABSOLUTE, rel = "user-profile", title = "User profile", bindings = @Binding(name = "id", value = "${instance.userid}")),
+            @InjectLink(resource = LoginResource.class, style = InjectLink.Style.ABSOLUTE, rel = "logout", title = "Logout")
+    })
     private List<Link> links;
     private String id;
     private String userid;

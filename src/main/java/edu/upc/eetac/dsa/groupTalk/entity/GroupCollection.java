@@ -1,6 +1,9 @@
 package edu.upc.eetac.dsa.groupTalk.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import edu.upc.eetac.dsa.groupTalk.GroupResource;
+import edu.upc.eetac.dsa.groupTalk.GroupTalkRootAPIResource;
+import edu.upc.eetac.dsa.groupTalk.LoginResource;
 import org.glassfish.jersey.linking.Binding;
 import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
@@ -14,7 +17,11 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GroupCollection {
-    @InjectLinks({})
+    @InjectLinks({
+            @InjectLink(resource = GroupTalkRootAPIResource.class, style = InjectLink.Style.ABSOLUTE, rel = "home", title = "GroupTalk Root API"),
+            @InjectLink(resource = GroupResource.class, style = InjectLink.Style.ABSOLUTE, rel = "current-groups", title = "Current groups"),
+            @InjectLink(resource = LoginResource.class, style = InjectLink.Style.ABSOLUTE, rel = "logout", title = "Logout")
+    })
     private List<Link> links;
     private long newestTimestamp;
     private long oldestTimestamp;
